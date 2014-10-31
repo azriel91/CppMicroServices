@@ -130,14 +130,43 @@ set(_public_headers
   module/usModuleVersion.h
 )
 
+#-----------------------------------------------------------------------------
+# Expose US_SOURCES if in embedded mode or using biicode
+#-----------------------------------------------------------------------------
+
 if(US_IS_EMBEDDED)
   set(US_SOURCES )
-  get_filename_component(_path_prefix "${PROJECT_SOURCE_DIR}" NAME)
-  set(_path_prefix "${_path_prefix}/src")
+
+  # If using Biicode, just prepend "src" to the source file paths
+  # Otherwise, prepend "<project_dir>/src"
+  if (BIICODE)
+    set(_path_prefix "src")
+  else()
+    get_filename_component(_path_prefix "${PROJECT_SOURCE_DIR}" NAME)
+    set(_path_prefix "${_path_prefix}/src")
+  endif()
+
   foreach(_src ${_srcs} ${_public_headers} ${_private_headers})
     list(APPEND US_SOURCES ${_path_prefix}/${_src})
   endforeach()
   set(US_SOURCES ${US_SOURCES} PARENT_SCOPE)
+endif()
+
+#-----------------------------------------------------------------------------
+# If using Biicode, generate the core module initialization code and resources
+#-----------------------------------------------------------------------------
+
+if(BIICODE)
+  set(US_GENERATED_SOURCES )
+  usFunctionGenerateModuleInit(US_GENERATED_SOURCES NAME ${PROJECT_NAME})
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
+  usFunctionEmbedResources(US_GENERATED_SOURCES LIBRARY_NAME ${PROJECT_NAME}
+                           ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources
+                           FILES manifest.json)
+
+  add_custom_target(GenerateCoreModuleResourceSource DEPENDS ${US_GENERATED_SOURCES})
+  set(US_GENERATED_SOURCES ${US_GENERATED_SOURCES} PARENT_SCOPE)
 endif()
 
 #-----------------------------------------------------------------------------

@@ -8,6 +8,13 @@ if(US_ENABLE_RESOURCE_COMPRESSION)
   list(APPEND srcs usResourceCompressor.c)
 endif()
 
+# Expose the sources to calling code
+set(US_RCC_EXECUTABLE_SOURCES )
+foreach(_src ${srcs})
+  list(APPEND US_RCC_EXECUTABLE_SOURCES tools/${_src})
+endforeach()
+set(US_RCC_EXECUTABLE_SOURCES ${US_RCC_EXECUTABLE_SOURCES} PARENT_SCOPE)
+
 add_executable(${US_RCC_EXECUTABLE_NAME} ${srcs})
 if(WIN32)
   target_link_libraries(${US_RCC_EXECUTABLE_NAME} Shlwapi)

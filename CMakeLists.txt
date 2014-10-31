@@ -372,7 +372,9 @@ endif()
 # Documentation
 #-----------------------------------------------------------------------------
 
-add_subdirectory(documentation)
+if(NOT BIICODE)
+  add_subdirectory(documentation)
+endif()
 
 #-----------------------------------------------------------------------------
 # Last configuration and install steps
@@ -458,5 +460,42 @@ if(US_BUILD_EXAMPLES)
   else()
     set(CppMicroServices_DIR ${PROJECT_BINARY_DIR})
     add_subdirectory(examples)
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
+# Enable Biicode support
+#-----------------------------------------------------------------------------
+
+if(BIICODE)
+  include(${CMAKE_HOME_DIRECTORY}/biicode.cmake)
+  INIT_BIICODE_BLOCK()
+  set(BII_CREATE_LIB True)
+  set(BII_LIB_TYPE SHARED)
+
+  # Mark sources that are not available until build time
+  set_source_files_properties(${US_GENERATED_SOURCES} PROPERTIES GENERATED 1)
+
+  # Specify the sources to be included in the library
+  set(BII_LIB_SRC ${US_SOURCES} ${US_GENERATED_SOURCES})
+
+  # There is no explicit import of usResourceCompressor.c in
+  # usResourceCompiler.cpp as the dependency is conditional. We override the
+  # BII_tools_usResourceCompiler_MAIN variable to tell Biicode which sources to
+  # use for the usResourceCompiler executable
+  set(BII_tools_usResourceCompiler_MAIN ${US_RCC_EXECUTABLE_SOURCES})
+
+  ADD_BIICODE_TARGETS()
+
+  add_dependencies(${BII_LIB_TARGET} GenerateCoreModuleResourceSource)
+
+  # Include the directory that contains the generated usConfig.h file
+  target_include_directories(${BII_LIB_TARGET} PUBLIC ${US_INTERNAL_INCLUDE_DIRS})
+
+  # Would like to move this inside the "tools" directory CMakeLists.txt, but
+  # this has to come after ADD_BIICODE_TARGETS, so need to put it here.
+  target_compile_options(${BII_tools_usResourceCompiler_TARGET} PUBLIC "-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_NAME}\"")
+  if(WIN32)
+    target_link_libraries(${BII_tools_usResourceCompiler_TARGET} Shlwapi)
   endif()
 endif()

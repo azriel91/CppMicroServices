@@ -1,0 +1,2 @@
+tools/usResourceCompressor.c = tools/miniz.c
+tools/usResourceCompiler.cpp + tools/usResourceCompressor.c
