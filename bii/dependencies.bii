@@ -1,2 +1,21 @@
+# CMake functions
+CMakeLists.txt + CMake/* src/* tools/*
+
+# Configuration files
+CMakeLists.txt + usConfig.h.in
+CMakeLists.txt + CppMicroServicesConfig.cmake.in
+CMakeLists.txt + CppMicroServicesConfigVersion.cmake.in
+
+# src dependencies
+src/service/usLDAPFilter.cpp + src/service/usLDAPExpr.cpp
+src/service/usServiceHooks.cpp + src/module/usModule.cpp
+src/service/usServiceListenerEntry.cpp + src/service/usLDAPExpr.cpp
+src/service/usServiceListeners.cpp + src/service/usLDAPExpr.cpp
+src/service/usServiceRegistry.cpp + src/service/usLDAPExpr.cpp
+
+# tools dependencies
+tools/CMakeLists.txt + tools/miniz.c tools/usResourceCompiler.cpp tools/usResourceCompressor.c
+
+# The usResourceCompiler may depend on the usResourceCompressor, but it is not explicitly imported
 tools/usResourceCompressor.c = tools/miniz.c
 tools/usResourceCompiler.cpp + tools/usResourceCompressor.c

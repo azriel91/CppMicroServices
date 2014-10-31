@@ -488,6 +488,9 @@ if(BIICODE)
   ADD_BIICODE_TARGETS()
 
   add_dependencies(${BII_LIB_TARGET} GenerateCoreModuleResourceSource)
+  if(US_LINK_LIBRARIES)
+    target_link_libraries(${BII_LIB_TARGET} ${US_LINK_LIBRARIES})
+  endif()
 
   # Include the directory that contains the generated usConfig.h file
   target_include_directories(${BII_LIB_TARGET} PUBLIC ${US_INTERNAL_INCLUDE_DIRS})
