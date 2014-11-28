@@ -1,8 +1,9 @@
 language: cpp
 compiler:
-  - gcc
-  - clang
+- gcc
+- clang
 env:
+  matrix:
   - BUILD_CONFIGURATION=0
   - BUILD_CONFIGURATION=1
   - BUILD_CONFIGURATION=2
@@ -11,11 +12,39 @@ env:
   - BUILD_CONFIGURATION=5
   - BUILD_CONFIGURATION=6
   - BUILD_CONFIGURATION=7
-
+  global:
+    secure: EhB7Kq75JSuANG3lX8cnhnTe4JpA6JLzcDcyMm1TpWFZ3Mj/po5QbOfLThwl8wZLjMI9Ry/fpelDMOqy43zrNt7zzEA4gw4GBGYbMov3Ec/OUQiAACrC7nwVynEIpXQghvuNjTyOdkoSvM2hDWrTKv5qE6nx0mM0BK8Pw1gIk60=
+before_install:
+- sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+- sudo apt-get update -qq
+- if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+- sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
+install:
+- wget -O bii-ubuntu64.deb http://www.biicode.com/downloads/latest/ubuntu64
+- "(sudo dpkg -i bii-ubuntu64.deb) && sudo apt-get -f install"
+- rm bii-ubuntu64.deb
+- wget https://s3.amazonaws.com/biibinaries/thirdparty/cmake-3.0.2-Linux-64.tar.gz
+- tar -xzf cmake-3.0.2-Linux-64.tar.gz
+- sudo cp -fR cmake-3.0.2-Linux-64/* /usr
+- rm -rf cmake-3.0.2-Linux-64
+- rm cmake-3.0.2-Linux-64.tar.gz
 branches:
   only:
-    - master
-    - development
-    - /^release-.*$/
+  - master
+  - development
+  - "/^release-.*$/"
+  - feature/add-biicode-support
+script:
+- ctest -VV -S ./CMake/usCTestScript_travis.cmake
+- bii init bii-us
+- mkdir -p ./bii-us/blocks/azriel/cppmicroservices
+- mv !(bii-us) ./bii-us/blocks/azriel/cppmicroservices
+- cd bii-us
+- bii find -um
+- bii cpp:build
+- "./bin/azriel_cppmicroservices_test"
 
-script: ctest -VV -S ./CMake/usCTestScript_travis.cmake
+after_success:
+- bii user azriel -p $BII_AZRIEL_PASSWORD
+- bii publish
