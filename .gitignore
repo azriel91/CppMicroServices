@@ -33,3 +33,10 @@ core/examples/makefile/main
 *.dylib
 *.xcconfig
 *.pbxproj
+
+# conan
+/build
+/conanfile.pyc
+/conaninfo.txt
+/conanbuildinfo.txt
+/conanbuildinfo.cmake
