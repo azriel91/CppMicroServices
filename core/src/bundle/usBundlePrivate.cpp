@@ -50,6 +50,8 @@ BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContex
   , q(qq)
   , lib(info->location)
 {
+  US_DEBUG << "Reading bundle " << info->name << " info from " << info->location;
+
   // Check if the bundle provides a manifest.json file and if yes, parse it.
   if (resourceContainer.IsValid())
   {
