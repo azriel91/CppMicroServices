@@ -4,16 +4,24 @@ import subprocess
 class CppMicroServicesConan(ConanFile):
     name = 'CppMicroServices'
     version = '2.99.0'
-    settings = ['os', 'compiler', 'build_type']
+    settings = ['os', 'compiler', 'build_type', 'arch']
     options = {
-        'US_ENABLE_AUTOLOADING_SUPPORT': 'OFF', # Enable bundle auto-loading support
-        'US_ENABLE_THREADING_SUPPORT':   'OFF', # Enable threading support
-        'US_ENABLE_DEBUG_OUTPUT':        'OFF', # Enable debug messages
-        'US_BUILD_SHARED_LIBS':          'ON',  # Build shared libraries
-        'US_BUILD_TESTING':              'OFF', # Build tests
-        'US_BUILD_EXAMPLES':             'OFF', # Build example projects
+        'US_ENABLE_AUTOLOADING_SUPPORT': ['ON', 'OFF'], # Enable bundle auto-loading support
+        'US_ENABLE_THREADING_SUPPORT':   ['ON', 'OFF'], # Enable threading support
+        'US_ENABLE_DEBUG_OUTPUT':        ['ON', 'OFF'], # Enable debug messages
+        'US_BUILD_SHARED_LIBS':          ['ON', 'OFF'], # Build shared libraries
+        'US_BUILD_TESTING':              ['ON', 'OFF'], # Build tests
+        'US_BUILD_EXAMPLES':             ['ON', 'OFF'], # Build example projects
     }
-    generators = ["cmake"]
+    default_options = (
+                        'US_ENABLE_AUTOLOADING_SUPPORT=OFF',
+                        'US_ENABLE_THREADING_SUPPORT=OFF',
+                        'US_ENABLE_DEBUG_OUTPUT=OFF',
+                        'US_BUILD_SHARED_LIBS=ON',
+                        'US_BUILD_TESTING=OFF',
+                        'US_BUILD_EXAMPLES=OFF'
+                      )
+    generators = ['cmake']
 
     # Prefer 'exports' over 'source' as we may want to build off a particular branch
     # Can we assume running 'git ls-files' to be safe?
@@ -84,4 +92,4 @@ class CppMicroServicesConan(ConanFile):
         # HACK: This is not the right way to get macros defined by other projects into cmake
         self.cpp_info.includedirs += ['.']
 
-        self.output.info(vars(self.cpp_info))
+        # self.output.info(vars(self.cpp_info))
