@@ -3,7 +3,7 @@ import subprocess
 
 class CppMicroServicesConan(ConanFile):
     name = 'CppMicroServices'
-    version = '2.99.0'
+    version = '3.0.0'
     settings = ['os', 'compiler', 'build_type', 'arch']
     options = {
         'US_ENABLE_AUTOLOADING_SUPPORT': ['ON', 'OFF'], # Enable bundle auto-loading support
